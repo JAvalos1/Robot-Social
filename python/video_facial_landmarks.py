@@ -1,5 +1,5 @@
 ##################################################################################
-#Detector de Expresiones Faciales
+#Robot Social de 3 DOF con detector de emociones
 #
 #Autor: Julio Fabian Avalos Peralta
 #Institucion: Facultad de Ingenieria UNA
@@ -22,6 +22,8 @@ import time
 import dlib
 import cv2
 from scipy.spatial import distance as dist
+import math
+import serial
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
@@ -35,6 +37,18 @@ def eye_aspect_ratio(eye):
 	ear = (A + B) / (2.0 * C)
 	# return the eye aspect ratio
 	return ear
+
+def giro_Z():
+	z = round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
+	return z
+
+#Para detectar la variacion de angulos se definen los siguientes parametros
+angz = 90
+prev_angz = 90
+
+#Se establece la conexion serial
+arduino = serial.Serial("COM3", 9600)
+time.sleep(2)
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -138,6 +152,23 @@ while True:
 		nariz2Hull = cv2.convexHull(nariz2)
 		cv2.drawContours(frame, [nariz1Hull], -1, (0, 0, 255), 1)
 		cv2.drawContours(frame, [nariz2Hull], -1, (0, 0, 255), 1)
+
+		#Se calcula la inclinacion de la cabeza considerando dos puntos de los ojos
+		angz = 90 + round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
+		print(angz)
+
+		if abs(angz-prev_angz)>3:
+			print('entra if')
+			#arduino.write(('s1'+str(angz)).encode())
+			#flag=0
+			#while flag==0:
+			#	rawString = arduino.readline()
+			#	print(rawString)
+			#	if rawString=='Completado\r\n'.encode():
+			#		flag=1
+		else:
+			prev_angz = angz
+			
 
 		#Se traza el menton
 		#menton = face_utils.FACIAL_LANDMARKS_IDXS['jaw']
