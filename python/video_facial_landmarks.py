@@ -53,6 +53,8 @@ fr_cnt = 0   #contador para la cantidad de frames a considerar consecutivos
 #time.sleep(2)
 ################################################################################################################
 
+def arduino_com(ang):
+	return
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -166,21 +168,21 @@ while True:
 		angz = 90 + round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
 		#print(angz)
 
-		if abs(angz-prev_angz)>1:
-			print('entra if')
+		if fr_cnt == 3:
 			prev_angz = angz
-			#arduino.write(('s1'+str(angz)).encode())
-			#flag=0
-			#while flag==0:
-			#	rawString = arduino.readline()
-			#	print(rawString)
-			#	if rawString=='Completado\r\n'.encode():
-			#		flag=1
-		elif fr_cnt == 3:
-			prev_angz = angz
+			if abs(angz-prev_angz)>1:
+				print('entra if')
+				prev_angz = angz
+				#arduino.write(('s1'+str(angz)).encode())
+				#flag=0
+				#while flag==0:
+				#	rawString = arduino.readline()
+				#	print(rawString)
+				#	if rawString=='Completado\r\n'.encode():
+				#		flag=1
 		else:
 			fr_cnt+=1
-			
+		
 
 		#Se traza el menton
 		#menton = face_utils.FACIAL_LANDMARKS_IDXS['jaw']
