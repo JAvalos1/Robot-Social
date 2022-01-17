@@ -49,8 +49,8 @@ fr_cnt = 0   #contador para la cantidad de frames a considerar consecutivos
 
 ################################################################################################################
 #Se establece la conexion serial
-#arduino = serial.Serial("COM3", 9600)
-#time.sleep(2)
+arduino = serial.Serial("COM3", 9600)
+time.sleep(2)
 ################################################################################################################
 
 def arduino_com(ang):
@@ -169,17 +169,17 @@ while True:
 		#print(angz)
 
 		if fr_cnt == 3:
-			prev_angz = angz
 			if abs(angz-prev_angz)>1:
-				print('entra if')
+				#print('entra if')
 				prev_angz = angz
-				#arduino.write(('s1'+str(angz)).encode())
+				arduino.write(('z'+str(angz)).encode())
 				#flag=0
 				#while flag==0:
 				#	rawString = arduino.readline()
 				#	print(rawString)
 				#	if rawString=='Completado\r\n'.encode():
 				#		flag=1
+			fr_cnt = 0
 		else:
 			fr_cnt+=1
 		
