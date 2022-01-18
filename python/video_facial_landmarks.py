@@ -47,6 +47,12 @@ angz = 90
 prev_angz = 90
 fr_cnt = 0   #contador para la cantidad de frames a considerar consecutivos
 
+#Valores dentro de la imagen que representa el centro, puede variar dependiendo del tamaño de la ventana
+x_centro = 200
+pos_x = 200
+y_centro = 200
+pos_y = 200
+
 ################################################################################################################
 #Se establece la conexion serial
 arduino = serial.Serial("COM3", 9600)
@@ -164,6 +170,10 @@ while True:
 		cv2.drawContours(frame, [nariz1Hull], -1, (0, 0, 255), 1)
 		cv2.drawContours(frame, [nariz2Hull], -1, (0, 0, 255), 1)
 
+		#Para el contacto visual se utilizara un punto de la nariz ubicado entre los ojos
+		pos_x = shape[28][0]
+		pos_y = shape[28][1]
+
 		#Se calcula la inclinacion de la cabeza considerando dos puntos de los ojos
 		angz = 90 + round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
 		#print(angz)
@@ -171,7 +181,6 @@ while True:
 		if fr_cnt == 3:
 			if abs(angz-prev_angz)>1:
 				#print('entra if')
-				prev_angz = angz
 				arduino.write(('z'+str(angz)).encode())
 				#flag=0
 				#while flag==0:
@@ -179,6 +188,12 @@ while True:
 				#	print(rawString)
 				#	if rawString=='Completado\r\n'.encode():
 				#		flag=1
+				prev_angz = angz
+
+			if abs(pos_x-x_centro) > 3:
+				pos_x = int(round(pos_x*0.45))
+				arduino.write(('x'+str(pos_x)).encode())
+				
 			fr_cnt = 0
 		else:
 			fr_cnt+=1
