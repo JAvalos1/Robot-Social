@@ -90,17 +90,17 @@ void loop() {
     // Mover en X para centrarla mirada en un rostro
     if (dataIn.startsWith("x")) {
       String dataInS = dataIn.substring(1, dataIn.length());
-      servo3Pos = dataInS.toInt();  
+      servo3Pos = servo3PPos + dataInS.toInt();  
        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
       if (servo3PPos > servo3Pos) {
         for ( int j = servo3PPos; j >= servo3Pos; j--) {
-          servo03.write(int(round(j*0.45)));
+          servo03.write(j);
           delay(20);
         }
       }
       if (servo3PPos < servo3Pos) {
         for ( int j = servo3PPos; j <= servo3Pos; j++) {
-          servo03.write(int(round(j*0.45)));
+          servo03.write(j);
           delay(20);
         }
       }

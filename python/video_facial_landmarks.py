@@ -98,7 +98,7 @@ while True:
 	# have a maximum width of 400 pixels, and convert it to
 	# grayscale
 	frame = vs.read()
-	frame = imutils.resize(frame, width=800)
+	frame = imutils.resize(frame, width=400)
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	# detect faces in the grayscale frame
 	rects = detector(gray, 0)
@@ -184,25 +184,31 @@ while True:
 			if abs(angz-prev_angz)>1:
 				#print('entra if')
 				arduino.write(('z'+str(angz)).encode())
-				#flag=0
-				#while flag==0:
-				#	rawString = arduino.readline()
-				#	print(rawString)
-				#	if rawString=='Completado\r\n'.encode():
-				#		flag=1
+				flag=0
+				while flag==0:
+					rawString = arduino.readline()
+					print(rawString)
+					if rawString=='Completado\r\n'.encode():
+						flag=1
 				prev_angz = angz
 
 			if abs(pos_x-x_ant) > 3:
-				ang_x = int(round(pos_x*0.45))
+				ang_x = int(round((pos_x-x_ant)*0.45))
 				arduino.write(('x'+str(ang_x)).encode())
 				print(ang_x)
+				flag=0
+				while flag==0:
+					rawString = arduino.readline()
+					print(rawString)
+					if rawString=='Completado\r\n'.encode():
+						flag=1
 				x_ant = pos_x
 
-			if abs(pos_y-y_ant) > 3:
-				ang_y = int(round(pos_y*0.45))
-				print(ang_y)	
-				arduino.write(('y'+str(ang_y)).encode())
-				x_ant = pos_x	
+			#if abs(pos_y-y_ant) > 3:
+			#	ang_y = int(round(pos_y*0.45))
+			#	#print(ang_y)	
+			#	arduino.write(('y'+str(ang_y)).encode())
+			#	x_ant = pos_x	
 				
 			fr_cnt = 0
 		else:
@@ -262,8 +268,8 @@ while True:
 		rightEAR = eye_aspect_ratio(ojoD)
 		rightEAR = rightEAR / pixel_cm_ratio
 
-		print(leftEAR)
-		print(rightEAR)
+		#print(leftEAR)
+		#print(rightEAR)
 		#print(dist_ojoD)
 		#print(dist_ojoI)
 
