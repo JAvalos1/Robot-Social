@@ -48,10 +48,12 @@ prev_angz = 90
 fr_cnt = 0   #contador para la cantidad de frames a considerar consecutivos
 
 #Valores dentro de la imagen que representa el centro, puede variar dependiendo del tamaño de la ventana
-x_centro = 200
+x_ant = 200
 pos_x = 200
-y_centro = 200
+ang_x = 0
+y_ant = 200
 pos_y = 200
+ang_y = 0
 
 ################################################################################################################
 #Se establece la conexion serial
@@ -190,9 +192,17 @@ while True:
 				#		flag=1
 				prev_angz = angz
 
-			if abs(pos_x-x_centro) > 3:
-				pos_x = int(round(pos_x*0.45))
-				arduino.write(('x'+str(pos_x)).encode())
+			if abs(pos_x-x_ant) > 3:
+				ang_x = int(round(pos_x*0.45))
+				arduino.write(('x'+str(ang_x)).encode())
+				print(ang_x)
+				x_ant = pos_x
+
+			if abs(pos_y-y_ant) > 3:
+				ang_y = int(round(pos_y*0.45))
+				print(ang_y)	
+				arduino.write(('y'+str(ang_y)).encode())
+				x_ant = pos_x	
 				
 			fr_cnt = 0
 		else:
