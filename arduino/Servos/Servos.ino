@@ -87,27 +87,97 @@ void loop() {
       Serial.println("Completado");  // Al terminar el movimiento, se envia por serial la instruccion de completado
     }
   
-    // Mover en X para centrarla mirada en un rostro
+    // Mover en X para centrar la mirada en un rostro
     if (dataIn.startsWith("x")) {
       String dataInS = dataIn.substring(1, dataIn.length());
-      servo3Pos = dataInS.toInt();  
-       //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
-      if (servo3PPos > servo3Pos) {
-        for ( int j = servo3PPos; j >= servo3Pos; j--) {
-          servo03.write(int(round(j*0.45)));
-          delay(20);
+      if (dataInS.startsWith("-")){
+        String dataInSS = dataInS.substring(1, dataInS.length());
+        servo3Pos = servo3PPos + dataInSS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo3PPos > servo3Pos) {
+          for ( int j = servo3PPos; j >= servo3Pos; j--) {
+            servo03.write(j);
+            delay(20);
+          }
         }
-      }
-      if (servo3PPos < servo3Pos) {
-        for ( int j = servo3PPos; j <= servo3Pos; j++) {
-          servo03.write(int(round(j*0.45)));
-          delay(20);
+        if (servo3PPos < servo3Pos) {
+          for ( int j = servo3PPos; j <= servo3Pos; j++) {
+            servo03.write(j);
+            delay(20);
+          }
         }
+        servo3PPos = servo3Pos;
+        Serial.println("Completado");
+        }
+      else{
+        servo3Pos = servo3PPos - dataInS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo3PPos > servo3Pos) {
+          for ( int j = servo3PPos; j >= servo3Pos; j--) {
+            servo03.write(j);
+            delay(20);
+          }
+        }
+        if (servo3PPos < servo3Pos) {
+          for ( int j = servo3PPos; j <= servo3Pos; j++) {
+            servo03.write(j);
+            delay(20);
+          }
+        }
+        servo3PPos = servo3Pos;
+        Serial.println("Completado");  
       }
-      servo3PPos = servo3Pos;
-      Serial.println("Completado");
     }
 
+    // Mover en Y para centrar la mirada en un rostro
+    if (dataIn.startsWith("y")) {
+      String dataInS = dataIn.substring(1, dataIn.length());
+      if (dataInS.startsWith("-")){
+        String dataInSS = dataInS.substring(1, dataInS.length());
+        servo1Pos = servo1PPos - dataInSS.toInt();
+        servo2Pos = servo2PPos + dataInSS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo1PPos > servo1Pos) {
+          for ( int j = servo1PPos; j >= servo1Pos; j--) {
+            servo01.write(j);
+            servo02.write(2*servo1PPos-j);
+            delay(20);
+          }
+        }
+        if (servo1PPos < servo1Pos) {
+          for ( int j = servo1PPos; j <= servo1Pos; j++) {
+            servo01.write(j);
+            servo02.write(2*servo1PPos-j);
+            delay(20);
+          }
+        }
+        servo1PPos = servo1Pos;   // se actualiza la posicion anterior a partir de la posicion actual para hacer de vuelta la comparacion
+        servo2PPos = servo2Pos;   // se actualiza la posicion anterior a partir de la posicion actual para hacer de vuelta la comparacion
+        Serial.println("Completado");  // Al terminar el movimiento, se envia por serial la instruccion de completado
+        }
+      else{
+        servo1Pos = servo1PPos + dataInS.toInt();
+        servo2Pos = servo2PPos - dataInS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo1PPos > servo1Pos) {
+          for ( int j = servo1PPos; j >= servo1Pos; j--) {
+            servo01.write(j);
+            servo02.write(2*servo1PPos-j);
+            delay(20);
+          }
+        }
+        if (servo1PPos < servo1Pos) {
+          for ( int j = servo1PPos; j <= servo1Pos; j++) {
+            servo01.write(j);
+            servo02.write(2*servo1PPos-j);
+            delay(20);
+          }
+        }
+        servo1PPos = servo1Pos;   // se actualiza la posicion anterior a partir de la posicion actual para hacer de vuelta la comparacion
+        servo2PPos = servo2Pos;   // se actualiza la posicion anterior a partir de la posicion actual para hacer de vuelta la comparacion
+        Serial.println("Completado");  // Al terminar el movimiento, se envia por serial la instruccion de completado
+      }
+    }
     /*
     // Mover la tercera acticulacion un angulo determinado recibido por serial
     if (dataIn.startsWith("s3")) {
