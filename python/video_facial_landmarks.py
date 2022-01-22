@@ -195,7 +195,7 @@ while True:
 			if abs(pos_x-x_ant) > 3:
 				ang_x = int(round((pos_x-x_ant)*0.45))
 				arduino.write(('x'+str(ang_x)).encode())
-				print(ang_x)
+				#print(ang_x)
 				flag=0
 				while flag==0:
 					rawString = arduino.readline()
@@ -204,11 +204,17 @@ while True:
 						flag=1
 				x_ant = pos_x
 
-			#if abs(pos_y-y_ant) > 3:
-			#	ang_y = int(round(pos_y*0.45))
-			#	#print(ang_y)	
-			#	arduino.write(('y'+str(ang_y)).encode())
-			#	x_ant = pos_x	
+			if abs(pos_y-y_ant) > 3:
+				ang_y = int(round((pos_y-y_ant)*0.45))
+				arduino.write(('y'+str(ang_y)).encode())
+				print(ang_y)
+				flag=0
+				while flag==0:
+					rawString = arduino.readline()
+					print(rawString)
+					if rawString=='Completado\r\n'.encode():
+						flag=1
+				y_ant = pos_y
 				
 			fr_cnt = 0
 		else:
