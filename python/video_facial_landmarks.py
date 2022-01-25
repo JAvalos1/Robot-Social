@@ -24,19 +24,20 @@ import cv2
 from scipy.spatial import distance as dist
 import math
 import serial
+from pygame import mixer
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
 	# vertical eye landmarks (x, y)-coordinates
-	A = dist.euclidean(eye[1], eye[5])
-	B = dist.euclidean(eye[2], eye[4])
+	#A = dist.euclidean(eye[1], eye[5])
+	#B = dist.euclidean(eye[2], eye[4])
 	# compute the euclidean distance between the horizontal
 	# eye landmark (x, y)-coordinates
-	C = dist.euclidean(eye[0], eye[3])
+	#C = dist.euclidean(eye[0], eye[3])
 	# compute the eye aspect ratio
-	ear = (A + B) / (2.0 * C)
+	#ear = (A + B) / (2.0 * C)
 	# return the eye aspect ratio
-	return ear
+	return 0#ear
 
 def giro_Z():
 	z = round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
@@ -46,6 +47,8 @@ def giro_Z():
 angz = 90
 prev_angz = 90
 fr_cnt = 0   #contador para la cantidad de frames a considerar consecutivos
+
+fr_par_cnt = 0
 
 #Valores dentro de la imagen que representa el centro, puede variar dependiendo del tamaño de la ventana
 x_ant = 200
@@ -57,12 +60,14 @@ ang_y = 0
 
 ################################################################################################################
 #Se establece la conexion serial
-arduino = serial.Serial("COM3", 9600)
+arduino = serial.Serial("COM8", 9600)
 time.sleep(2)
 ################################################################################################################
 
-def arduino_com(ang):
-	return
+mixer.init()
+sonrisa = mixer.Sound('risa2.mp3')
+triste = mixer.Sound('triste.mp3')
+beso = mixer.Sound('beso.mp3')
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -126,6 +131,7 @@ while True:
 		#en los extremos de los ojos, o puede ser cualquiera como la nariz, etc
 		#Aproximadamente esta distancia es de: 10 cm
 		pixel_cm_ratio = dist.euclidean(shape[45], shape[36]) / 10
+		#pixel_cm_ratio = (((shape[45][0]-shape[36][0])**2+(shape[45][0]-shape[36][1])**2)**0.5) / 10
 
 		# Se trazan los labios
 		boca1 = face_utils.FACIAL_LANDMARKS_IDXS['mouth']
@@ -173,8 +179,8 @@ while True:
 		cv2.drawContours(frame, [nariz2Hull], -1, (0, 0, 255), 1)
 
 		#Para el contacto visual se utilizara un punto de la nariz ubicado entre los ojos
-		pos_x = shape[28][0]
-		pos_y = shape[28][1]
+		pos_x = shape[33][0]
+		pos_y = shape[33][1]
 
 		#Se calcula la inclinacion de la cabeza considerando dos puntos de los ojos
 		angz = 90 + round(math.degrees(math.atan((shape[45][1]-shape[36][1])/(shape[45][0]-shape[36][0]))))
@@ -193,32 +199,64 @@ while True:
 				prev_angz = angz
 
 			if abs(pos_x-x_ant) > 3:
-				ang_x = int(round((pos_x-x_ant)*0.45))
-				arduino.write(('x'+str(ang_x)).encode())
-				#print(ang_x)
-				flag=0
-				while flag==0:
-					rawString = arduino.readline()
-					print(rawString)
-					if rawString=='Completado\r\n'.encode():
-						flag=1
+				if abs(pos_x-200) > 100:
+					ang_x = int(round((pos_x-200)*0.45))
+					arduino.write(('x'+str(ang_x)).encode())
+					#print(ang_x)
+					flag=0
+					while flag==0:
+						rawString = arduino.readline()
+						print(rawString)
+						if rawString=='Completado\r\n'.encode():
+							flag=1
+					arduino.write(('ox'+'90').encode())
+					flag=0
+					while flag==0:
+						rawString = arduino.readline()
+						print(rawString)
+						if rawString=='Completado\r\n'.encode():
+							flag=1
+				else:
+					ang_x = int(round((pos_x-200)*0.45))
+					arduino.write(('ox'+str(ang_x)).encode())
+					print(ang_x)
+					flag=0
+					while flag==0:
+						rawString = arduino.readline()
+						print(rawString)
+						if rawString=='Completado\r\n'.encode():
+							flag=1
+			else:
 				x_ant = pos_x
 
 			if abs(pos_y-y_ant) > 3:
 				ang_y = int(round((pos_y-y_ant)*0.45))
 				arduino.write(('y'+str(ang_y)).encode())
-				print(ang_y)
+				#print(ang_y)
 				flag=0
 				while flag==0:
 					rawString = arduino.readline()
 					print(rawString)
 					if rawString=='Completado\r\n'.encode():
 						flag=1
+			else:	
 				y_ant = pos_y
 				
 			fr_cnt = 0
 		else:
 			fr_cnt+=1
+
+		if fr_par_cnt == 50:
+			arduino.write('parpadeo'.encode())
+			flag=0
+			while flag==0:
+				rawString = arduino.readline()
+				print(rawString)
+				if rawString=='Completado\r\n'.encode():
+					flag=1
+			fr_par_cnt = 0
+		else:
+			fr_par_cnt+=1
 		
 
 		#Se traza el menton
@@ -233,9 +271,12 @@ while True:
 		dist_smile = dist_smile / pixel_cm_ratio
 		#print(dist_smile)
 		#diff_smile = dist_smile - dist_smile0
-		if dist_smile>7:
+		if (dist_smile>7) and (mixer.get_busy()== False):
 			cv2.putText(frame, "Sonrisa", (x - 100, y - 50),
 				cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+			sonrisa.play()
+			time.sleep(2.25)
+			mixer.stop()
 		
 		## Para detectar movimiento de las cejas
 		dist_cejaD = ((shape[19][0]-shape[27][0])**2+(shape[19][1]-shape[27][1])**2)**0.5
@@ -260,9 +301,12 @@ while True:
 		dist_labios = ((shape[62][0]-shape[66][0])**2+(shape[62][1]-shape[66][1])**2)**0.5
 		dist_labios = dist_labios / pixel_cm_ratio
 		#print(dist_labios)
-		if dist_smile<5.5 and dist_labios<1:
+		if (dist_smile < 5.5) and (dist_labios < 1) and (mixer.get_busy()== False):
 			cv2.putText(frame, "Beso", (x - 60, y - 50),
 				cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+			beso.play()
+			time.sleep(2.25)
+			mixer.stop()
 
 		## Para detectar ojos cerrados
 		#dist_ojoD = ((shape[37][0]-shape[41][0])**2+(shape[37][1]-shape[41][1])**2)**0.5

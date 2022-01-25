@@ -20,22 +20,28 @@ Servo servo03;
 Servo servo04;
 Servo servo05;
 Servo servo06;
+Servo servo07;
+Servo servo08;
+Servo servo09;
 
 //ROBOT
-int servo1Pos, servo2Pos, servo3Pos, servo4Pos, servo5Pos, servo6Pos; // posicion actual
-int servo1PPos, servo2PPos, servo3PPos, servo4PPos, servo5PPos, servo6PPos; // posicion anterior
+int servo1Pos, servo2Pos, servo3Pos, servo4Pos, servo5Pos, servo6Pos, servo7Pos, servo8Pos, servo9Pos; // posicion actual
+int servo1PPos, servo2PPos, servo3PPos, servo4PPos, servo5PPos, servo6PPos, servo7PPos, servo8PPos, servo9PPos; // posicion anterior
 String dataIn = "";
 
 void setup() {
   Serial.begin(9600);
 
   //ROBOT
-  servo01.attach(3);
-  servo02.attach(5);
-  servo03.attach(6);
-  servo04.attach(9);
-  servo05.attach(10);
-  servo06.attach(11);
+  servo01.attach(2);
+  servo02.attach(3);
+  servo03.attach(4);
+  servo04.attach(5);
+  servo05.attach(6);
+  servo06.attach(7);
+  servo07.attach(8);
+  servo08.attach(9);
+  servo09.attach(10);
   delay(20);
   // Posicion inicial del robot
   servo1PPos = 90;
@@ -48,8 +54,14 @@ void setup() {
   servo04.write(servo4PPos);
   servo5PPos = 90;
   servo05.write(servo5PPos);
-  servo6PPos = 180;
+  servo6PPos = 90;
   servo06.write(servo6PPos);
+  servo7PPos = 90;
+  servo07.write(servo7PPos);
+  servo8PPos = 90;
+  servo08.write(servo8PPos);
+  servo9PPos = 90;
+  servo09.write(servo9PPos);
 }
 void loop() {
 
@@ -178,49 +190,65 @@ void loop() {
         Serial.println("Completado");  // Al terminar el movimiento, se envia por serial la instruccion de completado
       }
     }
-    /*
+    
     // Mover la tercera acticulacion un angulo determinado recibido por serial
-    if (dataIn.startsWith("s3")) {
+    if (dataIn.startsWith("ox")) {
       String dataInS = dataIn.substring(2, dataIn.length());
-      servo3Pos = dataInS.toInt();  
-       Serial.println("moviendo motor 3 a: " + dataInS + " grados");
-      if (servo3PPos > servo3Pos) {
-        for ( int j = servo3PPos; j >= servo3Pos; j--) {
-          servo03.write(j);
-          delay(30);
+      if (dataInS.startsWith("-")){
+        String dataInSS = dataInS.substring(1, dataInS.length());
+        servo4Pos = servo4PPos + dataInSS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo4PPos > servo4Pos) {
+          for ( int j = servo4PPos; j >= servo4Pos; j--) {
+            servo04.write(j);
+            delay(20);
+          }
         }
-      }
-      if (servo3PPos < servo3Pos) {
-        for ( int j = servo3PPos; j <= servo3Pos; j++) {
-          servo03.write(j);
-          delay(30);
+        if (servo4PPos < servo4Pos) {
+          for ( int j = servo4PPos; j <= servo4Pos; j++) {
+            servo04.write(j);
+            delay(20);
+          }
         }
+        servo4PPos = servo4Pos;
+        Serial.println("Completado");
+        }
+      else{
+        servo4Pos = servo4PPos - dataInS.toInt();
+        //Serial.println("moviendo motor 2 a: " + dataInS + " grados");
+        if (servo4PPos > servo4Pos) {
+          for ( int j = servo4PPos; j >= servo4Pos; j--) {
+            servo04.write(j);
+            delay(20);
+          }
+        }
+        if (servo4PPos < servo4Pos) {
+          for ( int j = servo4PPos; j <= servo4Pos; j++) {
+            servo04.write(j);
+            delay(20);
+          }
+        }
+        servo4PPos = servo4Pos;
+        Serial.println("Completado");  
       }
-      servo3PPos = servo3Pos;
-      Serial.println("Completado");
     }
-    
+
+
     // Mover la cuarta acticulacion un angulo determinado recibido por serial
-    if (dataIn.startsWith("s4")) {
-      String dataInS = dataIn.substring(2, dataIn.length());
-      servo4Pos = dataInS.toInt();
-       Serial.println("moviendo motor 4 a: " + dataInS + " grados");
-      if (servo4PPos > servo4Pos) {
-        for ( int j = servo4PPos; j >= servo4Pos; j--) {
-          servo04.write(j);
-          delay(10);
-        }
-      }
-      if (servo4PPos < servo4Pos) {
-        for ( int j = servo4PPos; j <= servo4Pos; j++) {
-          servo04.write(j);
-          delay(10);
-        }
-      }
-      servo4PPos = servo4Pos;
+    if (dataIn.startsWith("parpadeo")) {
+      servo05.write(40);
+      servo06.write(130);
+      servo07.write(130);
+      servo08.write(50);
+      delay(200);
+      servo05.write(90);
+      servo06.write(90);
+      servo07.write(90);
+      servo08.write(90);
       Serial.println("Completado");
     }
-    
+
+    /*
     // Mover la quinta acticulacion un angulo determinado recibido por serial
     if (dataIn.startsWith("s5")) {
       String dataInS = dataIn.substring(2, dataIn.length());
