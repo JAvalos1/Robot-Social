@@ -209,13 +209,7 @@ while True:
 						print(rawString)
 						if rawString=='Completado\r\n'.encode():
 							flag=1
-					arduino.write(('ox'+'90').encode())
-					flag=0
-					while flag==0:
-						rawString = arduino.readline()
-						print(rawString)
-						if rawString=='Completado\r\n'.encode():
-							flag=1
+
 				else:
 					ang_x = int(round((pos_x-200)*0.45))
 					arduino.write(('ox'+str(ang_x)).encode())
@@ -230,7 +224,7 @@ while True:
 				x_ant = pos_x
 
 			if abs(pos_y-y_ant) > 3:
-				ang_y = int(round((pos_y-y_ant)*0.45))
+				ang_y = int(round((pos_y-200)*0.45))
 				arduino.write(('y'+str(ang_y)).encode())
 				#print(ang_y)
 				flag=0
